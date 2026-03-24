@@ -51,7 +51,7 @@ export function Bill({ data }: BillProps) {
       {/* Footer */}
       <div style={{ textAlign: "center", marginTop: "40px", borderTop: "2px solid #333", paddingTop: "16px" }}>
         <p style={{ margin: "0 0 8px 0", fontSize: "14px" }}>
-          Ngày {data.day} tháng {data.month} năm {data.year}
+          {data.date}
         </p>
         <p style={{ margin: "16px 0 0 0", fontSize: "12px", color: "#666", fontStyle: "italic" }}>
           Cảm ơn quý công đức nhân
