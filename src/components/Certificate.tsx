@@ -9,13 +9,11 @@ interface CertificateProps {
 
 export function Certificate({ data, bgUrl }: CertificateProps) {
   const values: Record<string, string> = {
-    name:   data.name,
-    addr:   data.addr,
+    name: data.name,
+    addr: data.addr,
     amount: data.amount ? formatMoney(data.amount) : "",
-    words:  data.words,
-    day:   data.day,
-    month:  data.month,
-    year:   data.year,
+    words: data.words,
+    date: data.date,
   };
 
   return (
@@ -37,6 +35,30 @@ export function Certificate({ data, bgUrl }: CertificateProps) {
         style={{ width: "100%", height: "100%", display: "block", objectFit: "fill" }}
         draggable={false}
       />
+      <div id="cert-overlays">
+      {FIELD_OVERLAYS.map((f) => (
+        <div
+          key={f.key}
+          style={{
+            position: "absolute",
+            top: `${f.top}%`,
+            left: `${f.left-10}%`,
+            right: `${f.right}%`,
+            color: "#555555",
+            fontFamily: "'Times New Roman', 'Noto Serif', serif",
+            fontWeight: f.fontWeight,
+            fontStyle: "normal",
+            fontSize: `${f.fontSize}cqw`,
+            lineHeight: 1.25,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            pointerEvents: "none",
+          }}
+        >
+          {f.label ? `${f.label}:` : ""}
+        </div>
+      ))}
 
       {FIELD_OVERLAYS.map((f) => (
         <div
@@ -61,6 +83,7 @@ export function Certificate({ data, bgUrl }: CertificateProps) {
           {values[f.key]}
         </div>
       ))}
+      </div>
     </div>
   );
 }

@@ -7,9 +7,6 @@ export interface CertFormData {
 
 export interface CertDisplayData extends CertFormData {
   date: string;
-  day: string;
-  month: string;
-  year: string;
 }
 
 export interface DonationRecord {
@@ -30,4 +27,5 @@ export interface FieldOverlay {
   fontWeight: string;
   fontSize: number; // in cqw units
   fontStyle?: string;
+  label?: string;
 }

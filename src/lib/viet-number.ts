@@ -54,14 +54,5 @@ export function formatMoney(raw: string): string {
 
 export function todayVN(): string {
   const d = new Date();
-  return `Ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
-}
-
-export function todayOutput(): { day: string; month: string; year: string } {
-  const d = new Date();
-  return {
-    day: d.getDate().toString(),
-    month: (d.getMonth() + 1).toString(),
-    year: d.getFullYear().toString().slice(-1),
-  };
+  return `Đà Nẵng, Ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
 }

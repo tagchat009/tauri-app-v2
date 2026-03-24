@@ -4,11 +4,11 @@ import { Certificate } from "@/components/Certificate";
 import { Bill } from "@/components/Bill";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { useHistory } from "@/hooks/useHistory";
-import { numberToWords, todayVN, todayOutput } from "@/lib/viet-number";
+import { numberToWords, todayVN } from "@/lib/viet-number";
 import type { CertFormData, CertDisplayData, DonationRecord } from "@/types";
 
 const EMPTY_FORM: CertFormData = { name: "", addr: "", amount: "", words: "" };
-const EMPTY_CERT: CertDisplayData = { ...EMPTY_FORM, date: "", day: "", month: "", year: "" };
+const EMPTY_CERT: CertDisplayData = { ...EMPTY_FORM, date: "" };
 
 export default function App() {
   const [form, setForm] = useState<CertFormData>(EMPTY_FORM);
@@ -17,7 +17,6 @@ export default function App() {
 
   const { history, loading, loadHistory, saveRecord, removeRecord, clearHistory } = useHistory();
   const bgUrl = "./src/assets/background.jpg";
-  const { day, month, year } = todayOutput();
 
   useEffect(() => { loadHistory(); }, [loadHistory]);
 
@@ -31,7 +30,7 @@ export default function App() {
   };
 
   const fill = async () => {
-    const newCert: CertDisplayData = { ...form, day, month, year, date: todayVN() };
+    const newCert: CertDisplayData = { ...form, date: todayVN() };
     setCert(newCert);
     if (form.name.trim()) {
       try {
@@ -45,7 +44,40 @@ export default function App() {
   };
 
   const handlePrint = () => {
-    fill().then(() => setTimeout(() => window.print(), 200));
+    fill().then(() => setTimeout(() => {
+      const certElement = document.getElementById("cert-overlays");
+      if (certElement) {
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Phiếu Công Đức</title>
+              <style>
+                 @page {
+                  margin: 0;
+                  size: auto;
+                }
+                @media print {
+                  body { margin: 0; padding: 0; }
+                  body * { margin: 0; padding: 0; box-sizing: border-box; }
+                }
+              </style>
+            </head>
+            <body>
+              ${certElement.outerHTML}
+              <script>
+                window.print();
+                window.close();
+              </script>
+            </body>
+            </html>
+          `);
+          printWindow.document.close();
+        }
+      }
+    }, 200));
   };
 
   const handlePrintBill = () => {
@@ -61,6 +93,10 @@ export default function App() {
               <head>
                 <title>Phiếu Thu</title>
                 <style>
+                   @page {
+                    margin: 0;
+                    size: auto;
+                  }
                   @media print {
                     body { margin: 0; padding: 0; }
                     body * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -91,7 +127,7 @@ export default function App() {
   const loadRec = (rec: DonationRecord) => {
     const f: CertFormData = { name: rec.name, addr: rec.addr, amount: rec.amount, words: rec.words };
     setForm(f);
-    setCert({ ...f, day, month, year, date: todayVN() });
+    setCert({ ...f, date: todayVN() });
   };
 
   return (
