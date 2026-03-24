@@ -16,7 +16,7 @@ export default function App() {
   const [saved, setSaved] = useState(false);
 
   const { history, loading, loadHistory, saveRecord, removeRecord, clearHistory } = useHistory();
-  const bgUrl = "./src/assets/background.jpg";
+  const bgUrl = "./background.jpg";
 
   useEffect(() => { loadHistory(); }, [loadHistory]);
 
