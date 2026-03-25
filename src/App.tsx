@@ -29,9 +29,13 @@ export default function App() {
     });
   };
 
-  const fill = async () => {
+  const fillDisplay = () => {
     const newCert: CertDisplayData = { ...form, date: todayVN() };
     setCert(newCert);
+  };
+
+  const fill = async () => {
+    fillDisplay();
     if (form.name.trim()) {
       try {
         await saveRecord({ name: form.name, addr: form.addr, amount: form.amount, words: form.words });
@@ -44,7 +48,8 @@ export default function App() {
   };
 
   const handlePrint = () => {
-    fill().then(() => setTimeout(() => {
+    fillDisplay();
+    setTimeout(() => {
       const certElement = document.getElementById("cert-overlays");
       if (certElement) {
         const printWindow = window.open("", "_blank");
@@ -77,46 +82,45 @@ export default function App() {
           printWindow.document.close();
         }
       }
-    }, 200));
+    }, 200);
   };
 
   const handlePrintBill = () => {
-    fill().then(() => {
-      setTimeout(() => {
-        const billElement = document.getElementById("bill-root");
-        if (billElement) {
-          const printWindow = window.open("", "_blank");
-          if (printWindow) {
-            printWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <title>Phiếu Thu</title>
-                <style>
-                   @page {
-                    margin: 0;
-                    size: auto;
-                  }
-                  @media print {
-                    body { margin: 0; padding: 0; }
-                    body * { margin: 0; padding: 0; box-sizing: border-box; }
-                  }
-                </style>
-              </head>
-              <body>
-                ${billElement.outerHTML}
-                <script>
-                  window.print();
-                  window.close();
-                </script>
-              </body>
-              </html>
-            `);
-            printWindow.document.close();
-          }
+    fillDisplay();
+    setTimeout(() => {
+      const billElement = document.getElementById("bill-root");
+      if (billElement) {
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Phiếu Thu</title>
+              <style>
+                 @page {
+                  margin: 0;
+                  size: auto;
+                }
+                @media print {
+                  body { margin: 0; padding: 0; }
+                  body * { margin: 0; padding: 0; box-sizing: border-box; }
+                }
+              </style>
+            </head>
+            <body>
+              ${billElement.outerHTML}
+              <script>
+                window.print();
+                window.close();
+              </script>
+            </body>
+            </html>
+          `);
+          printWindow.document.close();
         }
-      }, 200);
-    });
+      }
+    }, 200);
   };
 
   const clearForm = () => {
