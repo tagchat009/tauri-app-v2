@@ -19,7 +19,7 @@ export function CertForm({
   onChange,
   onFill,
   onPrint,
-  onPrintBill,
+  //onPrintBill,
   onClear,
 }: CertFormProps) {
 
@@ -101,9 +101,9 @@ export function CertForm({
         <button className="btn btn-red" onClick={onPrint}>
           🖨️ In Phiếu
         </button>
-        <button className="btn btn-blue" onClick={onPrintBill}>
+        {/* <button className="btn btn-blue" onClick={onPrintBill}>
           📄 In Bill
-        </button>
+        </button> */}
         <button className="btn btn-clear" onClick={onClear}>
           ✕
         </button>

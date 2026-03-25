@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import { CertForm } from "@/components/CertForm";
 import { Certificate } from "@/components/Certificate";
 import { Bill } from "@/components/Bill";
@@ -6,7 +7,6 @@ import { HistoryPanel } from "@/components/HistoryPanel";
 import { useHistory } from "@/hooks/useHistory";
 import { numberToWords, todayVN } from "@/lib/viet-number";
 import type { CertFormData, CertDisplayData, DonationRecord } from "@/types";
-
 const EMPTY_FORM: CertFormData = { name: "", addr: "", amount: "", words: "" };
 const EMPTY_CERT: CertDisplayData = { ...EMPTY_FORM, date: "" };
 
@@ -14,6 +14,9 @@ export default function App() {
   const [form, setForm] = useState<CertFormData>(EMPTY_FORM);
   const [cert, setCert] = useState<CertDisplayData>(EMPTY_CERT);
   const [saved, setSaved] = useState(false);
+
+  const certRef = useRef<HTMLDivElement>(null);
+  const billRef = useRef<HTMLDivElement>(null);
 
   const { history, loading, loadHistory, saveRecord, removeRecord, clearHistory } = useHistory();
   const bgUrl = "./background.jpg";
@@ -23,7 +26,6 @@ export default function App() {
   const handleChange = (field: keyof CertFormData, value: string) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
-      // Auto-convert amount → words
       if (field === "amount") next.words = numberToWords(value);
       return next;
     });
@@ -32,6 +34,7 @@ export default function App() {
   const fillDisplay = () => {
     const newCert: CertDisplayData = { ...form, date: todayVN() };
     setCert(newCert);
+    return newCert;
   };
 
   const fill = async () => {
@@ -47,80 +50,54 @@ export default function App() {
     }
   };
 
+  const printCert = useReactToPrint({
+    contentRef: certRef,
+    documentTitle: "Phiếu Công Đức",
+    pageStyle: `
+      @page { margin: 0; size: auto; }
+      @media print { body { margin: 0; padding: 0; } }
+    `,
+    onAfterPrint: () => {
+      const bg = document.getElementById("cert-bg");
+      if (bg) bg.style.visibility = "visible";
+    },
+  });
+
+  const printBill = useReactToPrint({
+    contentRef: billRef,
+    documentTitle: "Phiếu Thu",
+    pageStyle: `
+      @page { margin: 0; size: auto; }
+      @media print { body { margin: 0; padding: 0; } }
+    `,
+    onAfterPrint: () => {
+      if (billRef.current) {
+        billRef.current.style.position = "absolute";
+        billRef.current.style.left = "-9999px";
+      }
+    },
+  });
+
   const handlePrint = () => {
     fillDisplay();
-    setTimeout(() => {
-      const certElement = document.getElementById("cert-overlays");
-      if (certElement) {
-        const printWindow = window.open("", "_blank");
-        if (printWindow) {
-          printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Phiếu Công Đức</title>
-              <style>
-                 @page {
-                  margin: 0;
-                  size: auto;
-                }
-                @media print {
-                  body { margin: 0; padding: 0; }
-                  body * { margin: 0; padding: 0; box-sizing: border-box; }
-                }
-              </style>
-            </head>
-            <body>
-              ${certElement.outerHTML}
-              <script>
-                window.print();
-                window.close();
-              </script>
-            </body>
-            </html>
-          `);
-          printWindow.document.close();
-        }
-      }
-    }, 200);
+
+    // Hide background before print
+    const bg = document.getElementById("cert-bg");
+    if (bg) bg.style.visibility = "hidden";
+
+   setTimeout(() => printCert(), 100);
   };
 
   const handlePrintBill = () => {
     fillDisplay();
-    setTimeout(() => {
-      const billElement = document.getElementById("bill-root");
-      if (billElement) {
-        const printWindow = window.open("", "_blank");
-        if (printWindow) {
-          printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Phiếu Thu</title>
-              <style>
-                 @page {
-                  margin: 0;
-                  size: auto;
-                }
-                @media print {
-                  body { margin: 0; padding: 0; }
-                  body * { margin: 0; padding: 0; box-sizing: border-box; }
-                }
-              </style>
-            </head>
-            <body>
-              ${billElement.outerHTML}
-              <script>
-                window.print();
-                window.close();
-              </script>
-            </body>
-            </html>
-          `);
-          printWindow.document.close();
-        }
-      }
-    }, 200);
+
+    // Move bill into view before printing
+    if (billRef.current) {
+      billRef.current.style.position = "static";
+      billRef.current.style.left = "0";
+    }
+
+    setTimeout(() => printBill(), 100);
   };
 
   const clearForm = () => {
@@ -151,23 +128,16 @@ export default function App() {
         onClear={clearForm}
       />
 
-      {/* Certificate preview */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 8,
-          width: "100%",
-          maxWidth: 932,
-        }}
-      />
       <span className="preview-label no-print">Xem trước phiếu công đức</span>
 
-      <Certificate data={cert} bgUrl={bgUrl} />
+      {/* Certificate — ref attached here for printing */}
 
-      {/* Bill preview (hidden, used for bill printing) */}
-      <div style={{ display: "none" }}>
+      <div ref={certRef} style={{ width: "100%", maxWidth: 800, margin: "0 auto" }}>
+        <Certificate data={cert} bgUrl={bgUrl} />
+      </div>
+
+      {/* Bill — always rendered but visually hidden; ref for printing */}
+      <div ref={billRef} style={{ position: "absolute", left: "-9999px", top: 0 }}>
         <Bill data={cert} />
       </div>
 

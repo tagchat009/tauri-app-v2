@@ -34,55 +34,57 @@ export function Certificate({ data, bgUrl }: CertificateProps) {
         alt="Phiếu công đức"
         style={{ width: "100%", height: "100%", display: "block", objectFit: "fill" }}
         draggable={false}
+        id="cert-bg"
       />
-      <div id="cert-overlays">
-      {FIELD_OVERLAYS.map((f) => (
-        <div
-          key={f.key}
-          style={{
-            position: "absolute",
-            top: `${f.top}%`,
-            left: `${f.left-10}%`,
-            right: `${f.right}%`,
-            color: "#555555",
-            fontFamily: "'Times New Roman', 'Noto Serif', serif",
-            fontWeight: f.fontWeight,
-            fontStyle: "normal",
-            fontSize: `${f.fontSize}cqw`,
-            lineHeight: 1.25,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            pointerEvents: "none",
-          }}
-        >
-          {f.label ? `${f.label}:` : ""}
-        </div>
-      ))}
+      <div>
+        
+        {FIELD_OVERLAYS.map((f) => (
+          <div
+            key={f.key}
+            style={{
+              position: "absolute",
+              top: `${f.top}%`,
+              left: `${f.left - 10}%`,
+              right: `${f.right}%`,
+              color: "#555555",
+              fontFamily: "'Times New Roman', 'Noto Serif', serif",
+              fontWeight: f.fontWeight,
+              fontStyle: "normal",
+              fontSize: `${f.fontSize}cqw`,
+              lineHeight: 1.25,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              pointerEvents: "none",
+            }}
+          >
+            {f.label ? `${f.label}:` : ""}
+          </div>
+        ))}
 
-      {FIELD_OVERLAYS.map((f) => (
-        <div
-          key={f.key}
-          style={{
-            position: "absolute",
-            top: `${f.top}%`,
-            left: `${f.left}%`,
-            right: `${f.right}%`,
-            color: f.color,
-            fontFamily: "'Times New Roman', 'Noto Serif', serif",
-            fontWeight: f.fontWeight,
-            fontStyle: f.fontStyle ?? "normal",
-            fontSize: `${f.fontSize}cqw`,
-            lineHeight: 1.25,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            pointerEvents: "none",
-          }}
-        >
-          {values[f.key]}
-        </div>
-      ))}
+        {FIELD_OVERLAYS.map((f) => (
+          <div
+            key={f.key}
+            style={{
+              position: "absolute",
+              top: `${f.top}%`,
+              left: `${f.left}%`,
+              right: `${f.right}%`,
+              color: f.color,
+              fontFamily: "'Times New Roman', 'Noto Serif', serif",
+              fontWeight: f.fontWeight,
+              fontStyle: f.fontStyle ?? "normal",
+              fontSize: `${f.fontSize}cqw`,
+              lineHeight: 1.25,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              pointerEvents: "none",
+            }}
+          >
+            {values[f.key]}
+          </div>
+        ))}
       </div>
     </div>
   );
