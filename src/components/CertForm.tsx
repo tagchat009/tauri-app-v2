@@ -8,7 +8,6 @@ interface CertFormProps {
   onChange: (field: keyof CertFormData, value: string) => void;
   onFill: () => void;
   onPrint: () => void;
-  onPrintBill: () => void;
   onClear: () => void;
 }
 
@@ -19,7 +18,6 @@ export function CertForm({
   onChange,
   onFill,
   onPrint,
-  //onPrintBill,
   onClear,
 }: CertFormProps) {
 
