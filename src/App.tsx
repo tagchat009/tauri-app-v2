@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-//import { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 import { CertForm } from "@/components/CertForm";
 import { Certificate } from "@/components/Certificate";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { useHistory } from "@/hooks/useHistory";
 import { numberToWords, todayVN } from "@/lib/viet-number";
 import type { CertFormData, CertDisplayData, DonationRecord } from "@/types";
-import html2pdf from "html2pdf.js";
-import { openPath } from '@tauri-apps/plugin-opener';
+// import html2pdf from "html2pdf.js";
+// import { openPath } from '@tauri-apps/plugin-opener';
 
 const EMPTY_FORM: CertFormData = { name: "", addr: "", amount: "", words: "" };
 const EMPTY_CERT: CertDisplayData = { ...EMPTY_FORM, date: "" };
@@ -32,31 +32,6 @@ export default function App() {
     });
   };
 
-
-  async function exportElementToPdf(
-    el: HTMLElement,
-    filename: string
-  ) {
-    const opt = {
-      margin: 0,
-      filename,
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-
-    // Generate PDF
-    //@ts-ignore
-    await html2pdf().from(el).set(opt).save();
-
-    // ⚠️ html2pdf saves to Downloads by default
-    const filePath = `${filename}`;
-    const bg = document.getElementById("cert-bg");
-    if (bg) bg.style.visibility = "visible";
-    // Open with system viewer
-    await openPath(filePath);
-  }
-
   const fillDisplay = () => {
     const newCert: CertDisplayData = { ...form, date: todayVN() };
     setCert(newCert);
@@ -76,33 +51,31 @@ export default function App() {
     }
   };
 
-  // const printCert = useReactToPrint({
-  //   contentRef: certRef,
-  //   documentTitle: "Phiếu Công Đức",
-  //   pageStyle: `
-  //     @page { margin: 0; size: auto; }
-  //     @media print { body { margin: 0; padding: 0; } }
-  //   `,
-  //   onAfterPrint: () => {
-  //     const bg = document.getElementById("cert-bg");
-  //     if (bg) bg.style.visibility = "visible";
-  //   },
-  // });
+  const printCert = useReactToPrint({
+    contentRef: certRef,
+    documentTitle: "Phiếu Công Đức",
+    pageStyle: `
+      @page { margin: 0; size: auto; }
+      @media print { body { margin: 0; padding: 0; } }
+    `,
+    print: async (iframe: HTMLIFrameElement) => {
+      // Hide cert-bg inside the iframe clone
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) return;
+      const bg = iframeDoc.getElementById("cert-bg");
+      if (bg) bg.style.visibility = "hidden";
+      console.log("print called", iframe); // 👈 check if this appears
+      window.print();
+    },
+    onAfterPrint: () => {
+      const bg = document.getElementById("cert-bg");
+      if (bg) bg.style.visibility = "visible";
+    },
+  });
 
   const handlePrint = () => {
     fillDisplay();
-    // Hide background before print
-    const bg = document.getElementById("cert-bg");
-    if (bg) bg.style.visibility = "hidden";
-
-
-    setTimeout(async () => {
-      if (certRef.current) {
-        await exportElementToPdf(certRef.current, `${form.name || "phieu-cong-duc"}.pdf`);
-      }
-    }, 200);
-
-    // setTimeout(() => printCert(), 200);
+    printCert();
   };
 
   const clearForm = () => {
