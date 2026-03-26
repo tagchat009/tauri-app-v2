@@ -6,6 +6,8 @@
     "main"
   ],
   "permissions": [
+    "core:default",
+    "core:webview:allow-print",
     {
       "identifier": "opener:allow-open-path",
       "allow": [

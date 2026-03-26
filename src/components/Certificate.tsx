@@ -7,7 +7,7 @@ interface CertificateProps {
   bgUrl: string;
 }
 
-export function Certificate({ data, bgUrl }: CertificateProps) {
+export function Certificate({ data }: CertificateProps) {
   const values: Record<string, string> = {
     name: data.name,
     addr: data.addr,
@@ -29,13 +29,13 @@ export function Certificate({ data, bgUrl }: CertificateProps) {
         containerType: "inline-size",
       }}
     >
-      <img
+      {/* <img
         src={bgUrl}
         alt="Phiếu công đức"
         style={{ width: "100%", height: "100%", display: "block", objectFit: "fill" }}
         draggable={false}
         id="cert-bg"
-      />
+      /> */}
       <div>
         
         {FIELD_OVERLAYS.map((f) => (
